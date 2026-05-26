@@ -6,6 +6,17 @@ This is a **discovery aid**, not vendored code. Links lead to upstream repos —
 
 > Snapshot date: 2026-05-26. The Claude Code ecosystem moves fast; expect this list to drift. PRs welcome.
 
+## Start here — official skills already in this repo
+
+Before browsing the community catalog, know that this repo **already ships official scaffolding skills** for the framework. They live at `claude-plugin/atomic-agents/skills/` and a vendored copy is active under `.claude/skills/` (see `.claude/skills/README.md`):
+
+- `create-atomic-agent` — scaffold an `AtomicAgent[In, Out]`
+- `create-atomic-tool` — scaffold a `BaseTool[In, Out]`
+- `create-atomic-schema`, `create-atomic-context-provider`, `new-app`
+- `framework` — umbrella skill with 11 deep-dive reference files
+
+For most "I want to build something with atomic-agents" needs, these are better than anything in the community catalog below. The catalog is here for everything else (general-purpose skills, plugin bundles, cross-project tooling).
+
 ## How to use this catalog
 
 - **Browsing for ideas?** Skim the categories below — each entry is one line so you can scan quickly.
