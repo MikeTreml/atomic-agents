@@ -120,15 +120,25 @@ The Claude Code skills ecosystem is dense and active. Below is a curated cross-s
 
 ## Category B — Atomic Agents Tools (`BaseTool` subclasses)
 
-**The ecosystem really is thin.** After a deep search, only the official `atomic-forge` and two learning/extension repos qualify. The framework's design (each tool is a standalone downloadable folder, not a PyPI package) doesn't encourage third-party tool collections.
+The community ecosystem beyond the official forge is genuinely thin. This repo's local forge now includes a small **filesystem & binary-analysis pack** added on top of the upstream toolset.
 
-- **[BrainBlend-AI/atomic-agents/atomic-forge](https://github.com/BrainBlend-AI/atomic-agents/tree/main/atomic-forge)** — The official tool collection: calculator, web search (SearXNG, Tavily), PDF reader, Wikipedia, YouTube transcript, weather, arXiv, more. _Check here first before building your own._
+### In-repo forge tools (this fork)
+
+- **[`atomic-forge/tools/file_search`](../../atomic-forge/tools/file_search/)** — Recursive filesystem search by filename glob and/or content regex. Pure stdlib. _Use when an agent needs to locate code, configs, or logs without leaving the pipeline._
+- **[`atomic-forge/tools/pe_inspector`](../../atomic-forge/tools/pe_inspector/)** — Static PE inspection (`.exe`/`.dll`/`.sys`): headers, imports, exports, sections, SHA-256. Uses `pefile`. _For reverse engineering, malware triage, or learning what a DLL exposes — without executing it._
+- **[`atomic-forge/tools/dll_research`](../../atomic-forge/tools/dll_research/)** — Lookup of what 30+ common Windows DLLs do (kernel32, user32, ntdll, ws2_32, crypt32, ...). Self-contained reference table; unknown DLLs return a Microsoft Learn search URL. _Chains naturally after `pe_inspector` to explain each imported DLL._
+
+These three chain together: `file_search` → find candidate binaries → `pe_inspector` → extract imported DLLs → `dll_research` → explain what each one provides.
+
+### Official + community
+
+- **[BrainBlend-AI/atomic-agents/atomic-forge](https://github.com/BrainBlend-AI/atomic-agents/tree/main/atomic-forge)** — Upstream tool collection: calculator, web search (SearXNG, Tavily), PDF reader, Wikipedia, YouTube transcript, weather, arXiv, more. _Check here first before building your own._
 - **[atomic-forge tool structure guide](../../atomic-forge/guides/tool_structure.md)** — Local guide on tool layout and conventions. _Read this before writing your own tool._
 - **[w3bwizart/Atomic_Agents_Learn](https://github.com/w3bwizart/Atomic_Agents_Learn)** — Learning repo with custom agent + tool examples. _Useful for seeing third-party structure._
 - **[mrseanryan/gpt-multi-atomic-agents](https://github.com/mrseanryan/gpt-multi-atomic-agents)** — Multi-agent framework built on `atomic_agents` + Instructor + Pydantic. _Not a tool itself; closest third-party framework extension._
 - **[bububa/atomic-agents](https://github.com/bububa/atomic-agents)** — A Go re-implementation. _Reference if you want the design pattern in another language._
 
-> **Contribution opportunities.** There's no community `awesome-atomic-agents` list, and specific gaps include: a Reddit search tool, a Slack message tool, a GitHub-issues tool, a Notion tool, and a generic SQL-query tool. If you build one, link it back here.
+> **Contribution opportunities.** There's no community `awesome-atomic-agents` list, and remaining gaps include: a Reddit search tool, a Slack message tool, a GitHub-issues tool, a Notion tool, a generic SQL-query tool, a strings extractor (mimicking the Unix `strings` command), and a decompiler-runner wrapping Ghidra/IDA/dnSpy headlessly. If you build one, link it back here.
 
 ---
 
