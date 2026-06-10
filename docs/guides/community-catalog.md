@@ -15,7 +15,13 @@ Before browsing the community catalog, know that this repo **already ships offic
 - `create-atomic-schema`, `create-atomic-context-provider`, `new-app`
 - `framework` — umbrella skill with 11 deep-dive reference files
 
-For most "I want to build something with atomic-agents" needs, these are better than anything in the community catalog below. The catalog is here for everything else (general-purpose skills, plugin bundles, cross-project tooling).
+**This fork also ships a Dynamics 365 / X++ starter set:**
+
+- `xpp-authoring` — scaffold X++ AOT objects (classes, table/form extensions, CoC handlers, SysOperation services) with reference docs on AOT object kinds, CoC patterns, and extension-vs-overlayering
+- `xpp-build-deploy` — orchestrate model build, DB sync, BP analysis, packaging, and Azure DevOps pipelines via `d365fo.tools`
+- `xpp-reviewer` subagent — X++-specific code review (set-based vs row-based, security keys, transactions, CoC correctness, deprecated AX 2012 patterns)
+
+For most "I want to build something" needs, these in-repo skills are better than anything in the community catalog below. The catalog is here for everything else.
 
 ## How to use this catalog
 
@@ -124,11 +130,21 @@ The community ecosystem beyond the official forge is genuinely thin. This repo's
 
 ### In-repo forge tools (this fork)
 
+Filesystem + binary analysis pack:
+
 - **[`atomic-forge/tools/file_search`](../../atomic-forge/tools/file_search/)** — Recursive filesystem search by filename glob and/or content regex. Pure stdlib. _Use when an agent needs to locate code, configs, or logs without leaving the pipeline._
 - **[`atomic-forge/tools/pe_inspector`](../../atomic-forge/tools/pe_inspector/)** — Static PE inspection (`.exe`/`.dll`/`.sys`): headers, imports, exports, sections, SHA-256. Uses `pefile`. _For reverse engineering, malware triage, or learning what a DLL exposes — without executing it._
 - **[`atomic-forge/tools/dll_research`](../../atomic-forge/tools/dll_research/)** — Lookup of what 30+ common Windows DLLs do (kernel32, user32, ntdll, ws2_32, crypt32, ...). Self-contained reference table; unknown DLLs return a Microsoft Learn search URL. _Chains naturally after `pe_inspector` to explain each imported DLL._
 
-These three chain together: `file_search` → find candidate binaries → `pe_inspector` → extract imported DLLs → `dll_research` → explain what each one provides.
+D365 F&O / X++ pack:
+
+- **[`atomic-forge/tools/xpp_codebase_scan`](../../atomic-forge/tools/xpp_codebase_scan/)** — Regex-based scan of an X++ codebase for classes, table extensions, methods, EDTs, base enums. Pure stdlib; no D365 install required. _First-pass orientation before pointing heavier tooling at a model._
+- **[`atomic-forge/tools/d365_metadata_lookup`](../../atomic-forge/tools/d365_metadata_lookup/)** — Reference table for ~45 well-known D365 F&O AOT objects (CustTable, SalesLine, RunBaseBatch, SysOperation, ItemId, NoYes, ...) with category, description, key members, Microsoft Learn URLs. Self-contained; supports `extra_lookup` for ISV/project objects. _Use after `xpp_codebase_scan` to explain referenced objects._
+- **[`atomic-forge/tools/xpp_bp_runner`](../../atomic-forge/tools/xpp_bp_runner/)** — Subprocess wrapper for Microsoft's `xppbp.exe` Best Practice analyzer, with XML log parsing. Returns `tool_available=false` gracefully when running on Linux/CI without xppbp installed. _For BP enforcement in CI._
+
+Pipelines:
+- Binary triage: `file_search` → `pe_inspector` → `dll_research`
+- X++ review: `xpp_codebase_scan` → `d365_metadata_lookup` → `xpp_bp_runner`
 
 ### Official + community
 
@@ -226,6 +242,24 @@ Plugin marketplaces ship bundles of skills + agents + commands together, install
 ### Database
 
 - **[rdimascio/supabase-marketplace](https://github.com/rdimascio/supabase-marketplace)** — Supabase plugins for database, auth, storage, realtime, edge functions. _For full-stack Supabase apps._
+
+### Microsoft Dynamics 365 F&O / X++
+
+There are **no community Claude Code skills or plugins for X++** at time of writing — the in-repo `xpp-authoring`, `xpp-build-deploy`, and `xpp-reviewer` artifacts described in the "Start here" section are the only ones we found. The MCP-server and PowerShell-tooling ecosystem around D365 is much more developed; this section lists what to link skills to.
+
+MCP servers (community + official):
+
+- **[ccampora/mcp_xpp](https://github.com/ccampora/mcp_xpp)** — MCP server for X++ object creation, modification, and codebase navigation with VS2022 integration. _Pair with the `xpp-authoring` skill for live AOT interaction._
+- **[dynamics365ninja/d365fo-mcp-server](https://github.com/dynamics365ninja/d365fo-mcp-server)** — 54+ tools: metadata indexing, method signatures, table lookups, EDT suggestions, CoC detection, git diff analysis, MSBuild integration. _Most feature-complete community option._
+- **[xplusplus.ai/fo-semantic-mcp](https://xplusplus.ai/mcp-server.html)** — Artifact index covering 50K+ OOB F&O objects. _For semantic queries over the standard codebase._
+- **[Microsoft official MCP for D365 ERP](https://learn.microsoft.com/en-us/dynamics365/fin-ops-core/dev-itpro/copilot/copilot-mcp)** — Microsoft's own MCP framework for D365 agents. _Canonical reference if you're integrating with Copilot._
+
+Tools to wrap from atomic-agents `BaseTool` subclasses:
+
+- **[d365collaborative/d365fo.tools](https://github.com/d365collaborative/d365fo.tools)** — Mature PowerShell module (MIT) with ~50 cmdlets for build, sync, BP analysis, packaging, deploy. _The build/deploy skill above wraps these._
+- **[microsoft/Dynamics365-Xpp-Samples-Tools](https://github.com/microsoft/Dynamics365-Xpp-Samples-Tools)** — Official Azure DevOps YAML pipeline templates (`xpp-ci.yml`). _Starting point for any CI pipeline scaffold._
+- **[TrudAX/XppTools](https://github.com/TrudAX/XppTools)** — Source AOT objects (DEVTools field listers, query browsers, SQL executors). _Reference patterns when scaffolding similar tools yourself._
+- **[Microsoft `xppbp.exe`](https://learn.microsoft.com/en-us/dynamics365/fin-ops-core/dev-itpro/dev-tools/customization-analysis-report)** — Official X++ Best Practice analyzer CLI. _Wrapped by `xpp_bp_runner` above; runs on Windows D365 dev VMs only._
 
 ---
 
