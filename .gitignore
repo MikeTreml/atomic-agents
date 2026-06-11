@@ -152,7 +152,7 @@ personal_scripts/
 debug.log
 
 # AI tools
-.claude
+.claude/*
 !.claude/skills/
 !.claude/skills/**
 CLAUDE.md
